@@ -1,0 +1,7 @@
+When we insert character to base64 encoding we got:
+    - 8 character Binary number which represents inserted character,
+    - Binary charater is then divided to 6 character binary number,
+    - When result (binary number) of one dividing has got smaller lenght then 6 then it is complete to 6 by adding "0" to its end,
+    - To not get padding at the end we should got 3 binary numbers consist from 8 characters at first stage because: it is 24 bites (8 bites * 3 numbers = 24) and 24 bites after dividing by 6 is eqal to 4 (8 * 3 / 6 = 4) keeping in mind that base64 encoding result must be divided to 4 (in base64 "one pair" consist from 4 6 character binary number) without any remainer 
+    - Thus when dividing by 4 (one pair must have got 4 numbers) has got remainer then it is refilled to 4 by adding at it end padding "=" (maximum 2),
+    - Padding/s must exists at the end of result (when base64 encoding algorithm works fine) 

@@ -3,6 +3,7 @@ import { stdin, stdout } from "process";
 import { performance as prf } from "perf_hooks";
 
 type Encoded = string;
+type Decoded = string;
 class Base64 {
     static Base64Alphabet = [
         [0, 'A'],
@@ -74,7 +75,7 @@ class Base64 {
     
     /**
      * @param toEncode - characters which should be encoded to base64
-     * @returns 
+     * @returns {Encoded}
      * Enocode utf-8 characters sentence to base64 format
     */
     static encode(toEncode: string): Encoded {
@@ -99,7 +100,7 @@ class Base64 {
         // Insert characters from base64 alphabet
         const slices6 = binaryBytesChain.match(/\d{0,5}\S/g) || [];
         for (let sliceBinary of slices6) {
-            if (sliceBinary.length < 6 && sliceBinary.includes("1")) {
+            if (sliceBinary.length < 6) {
                 const refill0 = Base64.refill0encode(sliceBinary, 6);
                 sliceBinary = sliceBinary.concat(refill0);
             } else if (sliceBinary.length < 6 && !sliceBinary.includes("1")) {
@@ -132,6 +133,49 @@ class Base64 {
         return result;
     }
 
+    /**
+     * @param toDecode 
+     * @returns {Decoded}
+     * Decode from base64 to utf-8 again
+    */
+    public static decode(toDecode: string): Decoded {
+        toDecode = toDecode.replaceAll("=", "");
+        let result: string = "";
+
+        // Obtain chain with bites by transform each character to form of 8 bytes
+        let binaryString = "";
+        for (const char of toDecode.trim()) {
+            const characterCode = Base64.Base64Alphabet.find(([_, charE]) => charE == char)?.[0];
+            if (typeof characterCode == "number" && characterCode >= 0) {
+                let chCBin = characterCode.toString(2);
+                
+                if (chCBin.length < 6) {
+                    chCBin = Base64.refill0encode(chCBin, 6).concat(chCBin)
+                } else if (chCBin.length > 6) {
+                    chCBin = chCBin.slice(-1, 6);
+                };
+
+                binaryString += chCBin;
+            } else throw Error("Character doesn't exists on characters alphabet");
+        }
+
+        // Obtain utf-8 letter from it's code extracted from 8 bite binary amount
+        const bites8slices = binaryString.match(/\d{0,7}\S/g) || [];
+        for (const bites8 of bites8slices) {
+            if (bites8.length < 8) {
+                bites8.concat(Base64.refill0encode(bites8, 8))
+            } 
+            
+            const code = parseInt(bites8, 2);
+            const letter = Buffer.from([code]);
+            result += letter
+        }
+
+        // Branch back
+        return result
+    }
+
+    // Create string with responsible amount of lacking binary "0" to gain bites count specified in "toNumber" by bites located within "binarySentence" 
     private static refill0encode(binarySentence: string, toNumber: number) {
         const lackingZerosC = toNumber - binarySentence.length;
         let lackingZeros: string = "";
@@ -150,7 +194,10 @@ function question() {
     rdli.question("Data to encode/decode: ", answer => {
         const startTime = prf.now();
         const encoded = Base64.encode(answer.trim());
+        const decoded = Base64.decode(encoded);
         console.log(encoded)
+
+        question();
     })
 }
 question()

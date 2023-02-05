@@ -81,7 +81,6 @@ class Base64Encoding:
             to_fill.append("0")
 
         return ''.join(to_fill)
-                
 
 if __name__ == "__main__":
     question = input("Enter data to encode: ")

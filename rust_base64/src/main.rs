@@ -128,7 +128,7 @@ fn decode(mut d_sen: String) -> String {
             
             // Decode operation
             op(chunk)
-        } else if chunk.contains(&"1") {
+        } else {
             // Obtain set to refill chain tail with lacking zeros (0)
             let lacking_zeros = {
                 let mut res: Vec<&str> = vec![];

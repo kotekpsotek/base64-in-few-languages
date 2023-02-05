@@ -4,7 +4,7 @@ import { performance as prf } from "perf_hooks";
 
 type Encoded = string;
 type Decoded = string;
-class Base64 {
+export default class Base64 {
     static Base64Alphabet = [
         [0, 'A'],
         [1, 'B'],
